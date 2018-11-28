@@ -1,25 +1,24 @@
 // see http://thecatapi.com/
 const generateCatThumb = function() {
   const apiKey = '3e716ca0-8514-4bf0-bc87-4792a37c3ec0';
-  const userId = 'd0x7pr';
+  // const userId = 'd0x7pr';
   const apiUrl = 'https://api.thecatapi.com/v1/images/search?format=json&size=small';
   const fetchOptions = {
     headers: {
       'Content-Type': 'application/json',
       'x-api-key': apiKey,
-    }
+    },
   };
   return fetch(apiUrl, fetchOptions)
-    .then(function(response) {
-      return response.json();
-    });
+    .then(response => response.json());
 };
 
 
 const getRandomInt = function(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+  const lmin = Math.ceil(min);
+  const lmax = Math.floor(max);
+  // The maximum is exclusive and the minimum is inclusive
+  return Math.floor(Math.random() * (lmax - lmin)) + lmin;
 };
 
 const catChatPhrases = [
@@ -29,10 +28,10 @@ const catChatPhrases = [
   'ネコを溺愛している症状：ネコが悪態をつくと、止めるどころか撮影を始めるって',
   '深い深い、海のように深いご縁がありましたね。',
   'いい子、いい子。',
-  'にゃんすた'
+  'にゃんすた',
 ];
 const generateRandomCatChatPhrase = function() {
-  return "hello";
+  return catChatPhrases[getRandomInt(0, catChatPhrases.length - 1)];
 };
 
 // see https://market.mashape.com/blaazetech/robohash-image-generator
@@ -45,14 +44,12 @@ const generateRobotThumb = function() {
     headers: {
       'Content-Type': 'application/json',
       'X-Mashape-Key': apiKey,
-      mode: "cors",
-    }
+      'mode': 'cors',
+    },
   };
 
   return fetch(apiUrl, fetchOptions)
-    .then(function(response) {
-      return response.json();
-    });
+    .then(response => response.json());
 };
 
 const renderPost = function(robotThumbUrl, catThumbUrl, catChatPhrase) {
@@ -70,7 +67,7 @@ const renderPost = function(robotThumbUrl, catThumbUrl, catChatPhrase) {
   catThumbEl.src = catThumbUrl;
 
   const catChatPhraseEl = document.createElement('P');
-  catChatPhraseEl.innerText = generateRandomCatChatPhrase();
+  catChatPhraseEl.innerText = catChatPhrase;
 
   // ポストの子要素を組み合わせる（次々と追加していく）
   postEl.appendChild(robotThumbEl);
@@ -85,16 +82,17 @@ const renderPost = function(robotThumbUrl, catThumbUrl, catChatPhrase) {
 const addPost = async function() {
   Promise.all([
     generateRobotThumb(),
-    generateCatThumb()
+    generateCatThumb(),
+    generateRandomCatChatPhrase(),
   ])
-  .then(function(resultsArray) {
-    [robotThumb, catThumb] = resultsArray;
-    //　上の行はこの書き方の略、意味的に同じです：
-    // const robotThumb = resultsArray[0];
-    // const catThumb = resultsArray[1];
-    // 「分割代入」と呼びます。https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
-    renderPost(robotThumb.imageUrl, catThumb[0].url, 'hello');
-  });
+    .then((resultsArray) => {
+      const [robotThumb, catThumb, catChatPhrase] = resultsArray;
+      // 上の行はこの書き方の略、意味的に同じです：
+      // const robotThumb = resultsArray[0];
+      // const catThumb = resultsArray[1];
+      // 「分割代入」と呼びます。https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+      renderPost(robotThumb.imageUrl, catThumb[0].url, catChatPhrase);
+    });
 };
 
 const initPage = function() {
